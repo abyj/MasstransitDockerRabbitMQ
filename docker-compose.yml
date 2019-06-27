@@ -1,0 +1,31 @@
+version: '3.4'
+networks:
+  publishnet:
+
+services:
+  rabbit:
+    image: rabbitmq:management
+    container_name: rabbit
+    ports:
+            - "5673:5672"
+            - "15678:15672"
+    networks:
+        - publishnet
+  publisher:
+    image: ${DOCKER_REGISTRY-}publisher
+    build:
+      context: .
+      dockerfile: Publisher/Dockerfile
+    networks:
+        - publishnet
+    depends_on:
+        - rabbit
+  subscriber:
+    image: ${DOCKER_REGISTRY-}subscriber
+    build:
+      context: .
+      dockerfile: Subscriber/Dockerfile
+    networks:
+        - publishnet
+    depends_on:
+        - rabbit
